@@ -3071,7 +3071,7 @@
             <div class="container-center-new" style="min-height: calc(100vh - 105px); margin-bottom: 17px;">
                 <div id="layout-body-ajax" class="sbi-layout-body-container">
                     <div id="pageContent">
-
+                        <!-- ====================================================================================================== -->
                         <script type="text/javascript" language="Javascript">
                             var debitVoucherList, referenceVoucherDetails;
                             var checkRefVoucherCounterflag = true;
@@ -3758,10 +3758,7 @@
                                 }
                             }
                         </script>
-
-
-
-
+                        <!-- ====================================================================================================== -->
 
                         <title>Debit Voucher</title>
 
@@ -4342,13 +4339,6 @@
 
                             </div>
                         </div>
-
-
-
-
-
-
-
                     </div>
                 </div>
             </div>
@@ -4400,40 +4390,7 @@
             font-size: 20px;
         }
     </style>
-    <script>
-        $(document).ready(function () {
-            if (window.location.hash) {
-                $("#gsp-layout-body").html("");
-                if (true) {
-                    loadUrlContent();
-                }
-            } else if (false) {
-                $("#gsp-layout-body").html("");
-                loadUrl("fixedAsset/dashboard");
-            } else if (true) {
-                $("#gsp-layout-body").html("");
-                loadUrl("accounting/dashboard");
-            }
-
-            if (false) {
-                $("[data-dismiss=modal]").on('click', function () {
-                    $(this.parentNode).siblings('.modal-body').empty();
-                });
-            }
-        });
-
-        function redirectToLogoutPage() {
-            window.location = "/node/logout/index";
-        }
-
-        function loadUrlContent() {
-            var currentUrl = document.location.href;
-            var currentPage = currentUrl.substring(currentUrl.indexOf('#', 0), currentUrl.length);
-            var reqUrl = currentPage.substring(2, currentPage.length);
-            loadUrl(reqUrl);
-        }
-    </script>
-
+    
 
 
 
@@ -4472,24 +4429,6 @@
             background-size: 40px 40px;
         }
     </style>
-    <script>
-        $(document).ready(function () {
-            var SESSION_TIMEOUT = 7200000;
-            $.sessionTimeout({
-                title: 'Session Timeout Notification',
-                message: 'Your session is about to expire!',
-                countdownMessage: 'Redirecting in {timer}',
-                keepAliveUrl: ROOT_APP_CONTEXT_PATH + 'login/keepAlive',
-                logoutUrl: ROOT_APP_CONTEXT_PATH + 'logout/index',
-                redirUrl: ROOT_APP_CONTEXT_PATH + 'login/timeOut',
-                warnAfter: SESSION_TIMEOUT > 60000 ? SESSION_TIMEOUT - 60000 : SESSION_TIMEOUT,
-                redirAfter: SESSION_TIMEOUT > 60000 ? SESSION_TIMEOUT : SESSION_TIMEOUT + 60000,
-                countdownBar: true,
-                countdownSmart: true
-            });
-
-        });
-    </script>
 
 
     <script src="./SBICLOUD_files/jquery.bxslider.min.js.download"></script>
