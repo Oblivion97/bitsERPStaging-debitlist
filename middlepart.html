@@ -1,0 +1,1231 @@
+<div class="container-center-new" style="min-height: calc(100vh - 105px); margin-bottom: 17px;">
+    <div id="layout-body-ajax" class="sbi-layout-body-container">
+        <div id="pageContent">
+            <!-- ====================================================================================================== -->
+            <script type="text/javascript" language="Javascript">
+                var debitVoucherList, referenceVoucherDetails;
+                var checkRefVoucherCounterflag = true;
+
+                $(document).ready(function () {
+                    // handleTable();
+                    handleReferenceVoucherTable();
+                    getOrganizationList();
+                    // getVoucherNoList();
+                    getModuleList();
+
+
+                    $("#edit").prop("disabled", false);
+                    $('#organizationBranch').empty();
+                    var content = "<option value=''>-Select Organization Branch-</option>";
+                    $("#organizationBranch").append(content);
+                    $("#organizationBranch").select2();
+                    $('.date-picker').datepicker({
+                        rtl: Metronic.isRTL(),
+                        orientation: "center",
+                        autoclose: true,
+                        todayHighlight: 1
+                    });
+                    $("#status").select2();
+                    onClickRadioButton();
+                    $("#status option[value='Assigned']").remove();
+                    $("#status option[value='Hold']").remove();
+                });
+
+                function onClickRadioButton() {
+                    clearAndInitSelectList('#documentId', "-Select Document-");
+                    clearAndInitSelectList('#transactionNo', "-Transaction Number-");
+                    if (document.getElementById('auto').checked) {
+                        $("#voucherType").val(true);
+                        $("#autoVoucherDiv").removeClass("show hide").addClass("show");
+
+                    } else {
+                        $("#voucherType").val(false);
+                        $("#autoVoucherDiv").removeClass("show hide").addClass("hide");
+                        $("#module").select2("val", "");
+                        $("#documentId").select2("val", "");
+                        $("#documentId").empty();
+                        $("#transactionNo").empty();
+                    }
+
+                    handleTable();
+                }
+
+                function selectTableRow() {
+
+                    $("#debitVoucherList tbody tr").live("click", function (event) {
+                        $("#debitVoucherList tbody tr").removeClass('row_selected');
+                        $(this).addClass('row_selected');
+                        var selectedRow = debitVoucherList.fnGetData('.row_selected');
+                        $("#rowId").val(selectedRow.id);
+                        $("#isSubmit").val(selectedRow.is_submitted);
+                        if (selectedRow.is_submitted == 'true') {
+                            $("#edit").prop("disabled", true);
+                        } else {
+                            $("#edit").prop("disabled", false);
+                        }
+                        if (checkRefVoucherCounterflag == true) {
+                            checkRefVoucherCounterflag = false;
+                            showReferenceVoucherDetails(selectedRow.voucher_no);
+                        }
+                    });
+
+                    //        $('#debitVoucherList tbody').on('click', 'tr', function () {
+                    //            if ($(this).hasClass('row_selected')) {
+                    //                $(this).removeClass('row_selected');
+                    //            }
+                    //            else {
+                    //                debitVoucherList.$('tr.row_selected').removeClass('row_selected');
+                    //                $(this).addClass('row_selected');
+                    //            }
+                    //            var selectedRow = debitVoucherList.fnGetData('.row_selected');
+                    //            $("#rowId").val(selectedRow.id);
+                    //            $("#isSubmit").val(selectedRow.is_submitted);
+                    //            if (selectedRow.is_submitted == 'true') {
+                    //                $("#edit").prop("disabled", true);
+                    //            }
+                    //            else {
+                    //                $("#edit").prop("disabled", false);
+                    //            }
+                    //            showReferenceVoucherDetails(selectedRow.voucher_no);
+                    //        });
+                }
+
+                function getVoucherNoList() {
+                    var param = "voucherType=" + 'Debit Voucher';
+                    $.ajax({
+                        url: '/node/accJournalMaster/getVoucherListByVoucherType',
+                        type: 'GET',
+                        data: param,
+                        dataType: 'json',
+                        success: function (data) {
+                            var count = 0;
+                            var id;
+                            $("#voucherNo").empty();
+                            var content = "<option value=''>-Select Voucher No-</option>";
+                            $("#voucherNo").append(content);
+                            $.each(data.accJournalMasterList, function (i, val) {
+                                content = "<option value=" + val.voucher_no + ">" + val
+                                    .voucher_no + "</option>";
+                                $("#voucherNo").append(content);
+                                count++;
+                                id = val.voucher_no;
+                            });
+                            $("#voucherNo").select2();
+                            if (count == 1) {
+                                $("#voucherNo").select2().select2('val', id);
+                            }
+                        },
+                        error: function (x, e) {
+                            onAjaxError(x, e);
+                        }
+                    });
+                }
+
+                function getOrganizationList() {
+                    $.ajax({
+                        url: '/node/organization/getOrganizationList',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            var count = 0;
+                            var id;
+                            $("#organization").empty();
+                            var content = "<option value=''>-Select Organization-</option>";
+                            $("#organization").append(content);
+                            $.each(data.organizationList, function (i, val) {
+                                content = "<option value=" + val.id + ">" + val.name +
+                                    "</option>";
+                                $("#organization").append(content);
+                                count++;
+                                id = val.id;
+                            });
+                            $("#organization").select2();
+                            if (count == 1) {
+                                $("#organization").select2().select2('val', id);
+                                getOrganizationBranchList(id);
+                            }
+                        },
+                        error: function (x, e) {
+                            onAjaxError(x, e);
+                        }
+                    });
+                }
+
+                function getOrganizationBranchList(organizationId) {
+                    if (organizationId == '') {
+                        $('#organizationBranch').empty();
+                        var content = "<option value=''>-Select Organization Branch-</option>";
+                        $("#organizationBranch").append(content);
+                        $("#organizationBranch").select2();
+                        return;
+                    }
+                    var param = "organizationId=" + organizationId;
+                    $.ajax({
+                        url: '/node/appOrganizationBranch/getOrganizationBranchByAppUser',
+                        type: 'GET',
+                        data: param,
+                        dataType: 'json',
+                        success: function (data) {
+                            var count = 0;
+                            var id;
+                            $("#organizationBranch").empty();
+                            var content =
+                                "<option value=''>-Select Organization Branch-</option>";
+                            $("#organizationBranch").append(content);
+                            $.each(data.organizationBranchList, function (i, val) {
+                                content = "<option value=" + val.id + ">" + val.name +
+                                    "</option>";
+                                $("#organizationBranch").append(content);
+                                count++;
+                                id = val.id;
+                            });
+                            $("#organizationBranch").select2();
+                            //                if (count == 1) {
+                            //                    $("#organizationBranch").select2().select2('val', id);
+                            //                }
+                            $("#organizationBranch").select2().select2('val', $('#branchId')
+                                .val());
+                        },
+                        error: function (x, e) {
+                            onAjaxError(x, e);
+                        }
+                    });
+                }
+
+                function handleReferenceVoucherTable() {
+                    referenceVoucherDetails = $('#connectingVoucherList').dataTable({
+                        "paging": false,
+                        "ordering": false,
+                        "columns": [{
+                                "data": "date",
+                                "title": "Voucher Date"
+                            },
+                            {
+                                "data": "voucher_no",
+                                "title": "Voucher No."
+                            },
+                            {
+                                "data": "org_name",
+                                "title": "Organization"
+                            },
+                            {
+                                "data": "organization_branch_name",
+                                "title": "Organization Branch"
+                            },
+                            {
+                                "data": "is_posted",
+                                "title": "Posted"
+                            },
+                            {
+                                "data": "is_submitted",
+                                "title": "Submitted"
+                            },
+                            {
+                                "data": "id",
+                                "sClass": "hidden-col"
+                            },
+                            {
+                                "data": "voucher_type",
+                                "sClass": "hidden-col"
+                            },
+                            {
+                                "data": "payment_type",
+                                "sClass": "hidden-col"
+                            },
+                            {
+                                "data": "ref_voucher_no",
+                                "title": "Reference Voucher"
+                            },
+                            {
+                                "data": function (data, type, row, meta) {
+                                    return '<a href="#"  onclick="getComment(' + '\'' + data
+                                        .status + '\',' + '\'' + data.voucher_no + '\')">' +
+                                        data.status + '</a>';
+
+                                },
+                                "title": "Status"
+                            },
+                            {
+                                "data": function (data, type, row, meta) {
+                                    return '<a href="#"  onclick="setDataVoucherNo(' +
+                                        '\'' + data.voucher_no + '\')">Preview</a>';
+
+                                }
+                            }
+
+                        ],
+                        "columnDefs": [{
+                                "targets": [0],
+                                "render": function (data) {
+                                    return changeDateFormat(data);
+                                }
+                            },
+                            {
+                                "render": function (data, type, row) {
+                                    return (data == true) ? 'Yes' : 'No';
+                                },
+                                "targets": [4, 5]
+                            },
+                            {
+                                "targets": [2, 3],
+                                "visible": false
+                            }
+
+                        ],
+                        "order": [
+                            [1, "desc"]
+                        ], // set first column as a default sort by asc
+
+                        "bFilter": false
+                    });
+
+                }
+
+                function handleTable() {
+                    var organization = $("#organization").val() ? $("#organization").val() : "";
+                    var organizationBranch = $("#organizationBranch").val() ? $("#organizationBranch")
+                        .val() : "";
+                    var fromDate = $("#fromDate").val();
+                    var toDate = $("#toDate").val();
+                    if (!dateRangeCheck(fromDate, toDate)) {
+                        showError("From Date must be smaller than To Date!");
+                        return;
+                    }
+
+                    if (toDate) {
+                        if (!fromDate) {
+                            showInfo("Please select date from");
+                            return false;
+                        }
+                    }
+                    if (fromDate) {
+                        if (!toDate) {
+                            showInfo("Please select date to");
+                            return false;
+                        }
+                    }
+                    var status = $("#status").val();
+                    var voucherType = $("#voucherType").val();
+
+
+
+
+                    if (referenceVoucherDetails != null) {
+                        referenceVoucherDetails.dataTable().fnClearTable();
+                        referenceVoucherDetails.dataTable().fnDraw();
+                        $("#referenceVoucherDiv").hide();
+
+                    }
+                    if (debitVoucherList != null) debitVoucherList.fnDestroy();
+                    debitVoucherList = $('#debitVoucherList').dataTable({
+                        "dom": "<'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'<'table-group-actions pull-right'>>r><'table-scrollable't><'row'<'col-md-8 col-sm-12'pli><'col-md-4 col-sm-12'>>", // datatable layout
+                        "lengthMenu": [
+                            [10, 20, 30, 50, 100],
+                            [10, 20, 30, 50, 100] // change per page values here
+                        ],
+                        "pageLength": 10, // default records per page
+                        "language": { // language settings
+                            // metronic spesific
+                            "metronicGroupActions": "_TOTAL_ records selected:  ",
+                            "metronicAjaxRequestGeneralError": "Could not complete request. Please check your internet connection",
+
+                            // data tables spesific
+                            "lengthMenu": "<span class='seperator'>&nbsp;|&nbsp;</span>View _MENU_ records",
+                            "info": "<span class='seperator'>&nbsp;|&nbsp;</span>Found total _TOTAL_ records",
+                            "infoEmpty": "No records found to show",
+                            "emptyTable": "No data available in table",
+                            "zeroRecords": "No matching records found",
+                            "paginate": {
+                                "previous": "Prev",
+                                "next": "Next",
+                                "last": "Last",
+                                "first": "First",
+                                "page": "Page",
+                                "pageOf": "of"
+                            }
+                        },
+                        "orderCellsTop": true,
+
+                        "pagingType": "bootstrap_extended", // pagination type(bootstrap, bootstrap_full_number or bootstrap_extended)
+                        "autoWidth": false, // disable fixed width and enable fluid table
+                        "processing": false, // enable/disable display message box on record load
+                        "serverSide": true, // enable/disable server side ajax loading
+                        "ordering": false,
+                        "responsive": true,
+                        "ajax": $.fn.dataTable.pipeline({
+                            "url": '/node/accJournalMaster/getFilteredVoucherList',
+                            "type": "GET",
+                            "dataType": "json",
+                            "data": function (data) {
+                                data.organization = organization;
+                                data.orgBranch = organizationBranch.toString();
+                                data.fromDate = fromDate;
+                                data.toDate = toDate;
+                                data.status = status;
+                                data.type = 'Debit Voucher';
+                                data.voucherType = voucherType;
+                                data.postType = $('input[name=postType]:checked').val();
+                                data.module = $("#module").val();
+                                data.documentId = $("#documentId").val();
+                                data.transactionNo = $("#transactionNo").val();
+                                data.voucherNumber = $("#voucherNumber").val();
+                            },
+                            "pages": 1 // number of pages to cache
+                        }),
+
+                        "columns": [{
+                                "data": "date",
+                                name: "date"
+                            },
+                            {
+                                "data": "voucher_no",
+                                name: "voucher_no"
+                            },
+                            //{"data": "org_name",name:"org_name"},
+                            //{"data": "organization_branch_name",name:"organization_branch_name"},
+                            {
+                                "data": "payment_type",
+                                name: "payment_type"
+                            },
+                            {
+                                "data": "amount",
+                                name: "amount"
+                            },
+                            {
+                                "data": "is_posted",
+                                name: "is_posted"
+                            },
+                            {
+                                "data": "is_submitted",
+                                name: "is_submitted"
+                            },
+                            {
+                                "data": "id",
+                                name: "id",
+                                "sClass": "hidden-col"
+                            },
+                            {
+                                "data": function (data, type, row, meta) {
+                                    return '<a href="#"  onclick="getComment(' + '\'' + data
+                                        .status + '\',' + '\'' + data.voucher_no + '\')">' +
+                                        data.status + '</a>';
+
+                                }
+                            },
+                            {
+                                "data": function (data, type, row, meta) {
+                                    return '<a href="#accJournalMaster/list"  onclick="setDataVoucherNo(' +
+                                        '\'' + data.voucher_no + '\')">Preview</a>';
+
+                                }
+                            }
+                        ],
+                        "columnDefs": [{
+                                "targets": [0],
+                                "render": function (data) {
+                                    return changeDateFormat(data);
+                                }
+                            },
+                            {
+                                "render": function (data, type, row) {
+                                    return (data == true) ? 'Yes' : 'No';
+                                },
+                                "targets": [4, 5]
+                            },
+                            {
+                                "targets": [3],
+                                "render": function (data) {
+                                    return (data) ? toLocaleStringSet(data) : "";
+                                }
+                            },
+                            {
+                                "className": "dt-right",
+                                "targets": 3
+                            }
+                        ],
+                        "order": [
+                            [1, "desc"]
+                        ]
+
+
+                    });
+                    selectTableRow();
+                }
+
+                function getComment(status, voucher_no) {
+                    if (status == "Draft" || status == "Submitted") {
+                        //            alert("\"No Comments!\"");
+                        swal("Comments", "No Comments");
+                        return;
+                    }
+                    var data = "transactionId=" + voucher_no + "&actionTaken=" + status;
+                    $.ajax({
+                        url: '/node/workflowTransaction/getCommentsByTransactionIdAndAction',
+                        type: 'POST',
+                        data: data,
+                        dataType: 'json',
+                        success: function (data) {
+                            swal("Comments", "\"" + data.comment + "\"");
+                        }
+                    });
+                }
+
+                function setDataVoucherNo(voucherno) {
+                    var organizatonBranchId = $("#organizationBranch").val();
+                    var url = "/node/accJournalMaster/showReportByVoucherNo?format=PDF&voucherNo=" +
+                        voucherno + "&organizationBranchId=" + organizatonBranchId;
+                    window.open(url);
+                }
+
+                function edit() {
+                    var journalMasterId = $("#rowId").val();
+                    var isSubmit = $("#isSubmit").val();
+                    if (!journalMasterId) {
+                        showError("Please Select a Debit Voucher First!");
+                        return
+                    }
+                    //        if (isSubmit == "true") {
+                    //            showInfo("Submitted Voucher cannot be edited, you can only view");
+                    //        }
+
+                    var url = "accJournalMaster/getDebitVoucherListByIdAndShowView?journalMasterId=" +
+                        journalMasterId;
+                    loadUrl(url);
+                }
+
+
+                function changeDateFormat(date) {
+                    var date = new Date(date);
+                    var month = date.getMonth() + 1;
+                    return date.getDate() + "/" + (month.length > 1 ? month : month) + "/" + date
+                        .getFullYear();
+                }
+
+
+                function showReferenceVoucherDetails(voucherNo) {
+                    var organizationBranchId = $("#organizationBranch").val();
+                    var data = "voucherNo=" + voucherNo + "&organizationBranchId=" + organizationBranchId;
+                    $.ajax({
+                        url: '/node/accJournalMaster/getReferenceVoucherDetails',
+                        type: 'GET',
+                        data: data,
+                        dataType: 'json',
+                        success: function (data) {
+                            var tableData = data.referenceVoucherList;
+                            if (tableData.length > 1) {
+                                $("#referenceVoucherDiv").show();
+                            } else {
+                                $("#referenceVoucherDiv").hide();
+                            }
+                            referenceVoucherDetails.dataTable().fnDestroy();
+                            referenceVoucherDetails = $('#connectingVoucherList').dataTable({
+                                "aaData": tableData,
+                                "paging": false,
+                                "ordering": false,
+                                "columns": [{
+                                        "data": "date"
+                                    },
+                                    {
+                                        "data": "voucher_no"
+                                    },
+                                    {
+                                        "data": "org_name"
+                                    },
+                                    {
+                                        "data": "organization_branch_name"
+                                    },
+                                    {
+                                        "data": "is_posted"
+                                    },
+                                    {
+                                        "data": "is_submitted"
+                                    },
+                                    {
+                                        "data": "id",
+                                        "sClass": "hidden-col"
+                                    },
+                                    {
+                                        "data": "voucher_type",
+                                        "sClass": "hidden-col"
+                                    },
+                                    {
+                                        "data": "payment_type",
+                                        "sClass": "hidden-col"
+                                    },
+                                    {
+                                        "data": "ref_voucher_no"
+                                    },
+                                    {
+                                        "data": function (data, type, row, meta) {
+                                            return '<a href="#"  onclick="getComment(' +
+                                                '\'' + data.status + '\',' +
+                                                '\'' + data.voucher_no +
+                                                '\')">' + data.status + '</a>';
+                                        },
+                                        "title": "Status"
+                                    },
+                                    {
+                                        "data": function (data, type, row, meta) {
+                                            return '<a href="#"  onclick="setDataVoucherNo(' +
+                                                '\'' + data.voucher_no +
+                                                '\')">Preview</a>';
+                                        }
+                                    }
+                                ],
+                                "columnDefs": [{
+                                        "targets": [0],
+                                        "render": function (data) {
+                                            return changeDateFormat(data);
+                                        }
+                                    },
+                                    {
+                                        "render": function (data, type, row) {
+                                            return (data == true) ? 'Yes' :
+                                                'No';
+                                        },
+                                        "targets": [4, 5]
+                                    },
+                                    {
+                                        "targets": [2, 3],
+                                        "visible": false
+                                    }
+                                ],
+                                "order": [
+                                    [0, "asc"]
+                                ], // set first column as a default sort by asc
+
+                                "bFilter": false
+                            });
+                            checkRefVoucherCounterflag = true;
+                        }
+                    });
+
+                }
+
+                function getModuleList() {
+                    $.ajax({
+                        url: '/node/workflow/getModuleList',
+                        type: 'GET',
+                        dataType: 'json',
+                        success: function (data) {
+                            clearAndInitSelectList('#module', "-Select Module-");
+                            $.each(data.moduleList, function (i, val) {
+                                content = "<option value=" + val.id + ">" + val.name +
+                                    "</option>";
+                                $("#module").append(content);
+                            });
+
+                            $("#module").select2();
+                        },
+                        error: function (x, e) {
+                            onAjaxError(x, e);
+                        }
+                    });
+                }
+
+                function getDocumentName(moduleId) {
+                    var data = "moduleId=" + moduleId;
+                    $.ajax({
+                        url: '/node/feature/getFeatureActionList',
+                        type: 'GET',
+                        data: data,
+                        dataType: 'json',
+                        success: function (data) {
+                            clearAndInitSelectList('#documentId', "-Select Document-");
+                            $.each(data.featureAction, function (i, val) {
+                                content = "<option value=" + val.id + ">" + val
+                                    .actionName + "</option>";
+                                $("#documentId").append(content);
+                            });
+                            $("#documentId").select2();
+
+                            handleTable();
+
+                        },
+                        error: function (x, e) {
+                            onAjaxError(x, e);
+                        }
+                    });
+                }
+
+                function getTransactionNo() {
+                    if ($("#documentId").val()) {
+                        var params = {
+                            organization: $("#organization").val(),
+                            organizationBranch: $("#organizationBranch").val(),
+                            postType: $('input[name=postType]:checked').val(),
+                            voucherType: $("#voucherType").val(),
+                            type: 'Debit Voucher',
+                            module: $("#module").val(),
+                            documentId: $("#documentId").val(),
+                            transactionNo: $("#transactionNo").val()
+                        };
+
+                        $.ajax({
+                            url: '/node/accJournalMaster/getTransactionNo',
+                            type: 'GET',
+                            data: params,
+                            dataType: 'json',
+                            success: function (data) {
+                                clearAndInitSelectList('#transactionNo',
+                                    "-Transaction Number-");
+                                console.log(data);
+                                $.each(data.transactionList, function (i, val) {
+                                    content = "<option value=" + val
+                                        .ref_transaction_no + ">" + val
+                                        .ref_transaction_no + "</option>";
+                                    $("#transactionNo").append(content);
+                                });
+
+                                handleTable();
+                            },
+                            error: function (x, e) {
+                                onAjaxError(x, e);
+                            }
+                        });
+                    } else {
+                        clearAndInitSelectList('#transactionNo', "-Transaction Number-");
+                    }
+                }
+            </script>
+            <!-- ====================================================================================================== -->
+
+            <title>Debit Voucher</title>
+
+            <div id="application_top_panel" class="panel panel-default">
+                <div class="panel-heading">
+
+                    <div class="panel-title">
+                        <div class="caption">
+                            <i class="fa fa-filter"></i> Filter Debit Vouchers
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <form id="journalFilterForm" name="userForm" class="form-horizontal">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div class="form-group hidden">
+                                    <label class=" col-md-5">Organization:</label>
+                                    <div class="select2-container dropdown-input-field-control" id="s2id_organization">
+                                        <a href="javascript:void(0)" class="select2-choice" tabindex="-1"> <span
+                                                class="select2-chosen" id="select2-chosen-8">BRAC</span><abbr
+                                                class="select2-search-choice-close"></abbr> <span class="select2-arrow"
+                                                role="presentation"><b role="presentation"></b></span></a><label
+                                            for="s2id_autogen8" class="select2-offscreen"></label><input
+                                            class="select2-focusser select2-offscreen" type="text" aria-haspopup="true"
+                                            role="button" aria-labelledby="select2-chosen-8" id="s2id_autogen8">
+                                        <div class="select2-drop select2-display-none select2-with-searchbox">
+                                            <div class="select2-search"> <label for="s2id_autogen8_search"
+                                                    class="select2-offscreen"></label> <input type="text"
+                                                    autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                    spellcheck="false" class="select2-input" role="combobox"
+                                                    aria-expanded="true" aria-autocomplete="list"
+                                                    aria-owns="select2-results-8" id="s2id_autogen8_search"
+                                                    placeholder=""> </div>
+                                            <ul class="select2-results" role="listbox" id="select2-results-8"> </ul>
+                                        </div>
+                                    </div><select id="organization" name="organization"
+                                        onchange="getOrganizationBranchList(this.value)"
+                                        class="dropdown-input-field-control select2-offscreen" title="" tabindex="-1">
+                                        <option value="">-Select Organization-</option>
+                                        <option value="1">BRAC</option>
+                                    </select>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Date From:</label>
+
+                                    <div class="input-group input-medium date date-picker col-md-7"
+                                        data-date-format="dd/mm/yyyy">
+                                        <input type="text" id="fromDate" name="fromDate" placeholder="dd/mm/yyyy"
+                                            class="date-input-field-control" readonly="">
+                                        <span class="input-group-btn">
+                                            <button class="btn default date-image-control" type="button"><i
+                                                    class="fa fa-calendar"></i></button>
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Date To:</label>
+
+                                    <div class="input-group input-medium date date-picker col-md-7"
+                                        data-date-format="dd/mm/yyyy">
+                                        <input type="text" id="toDate" name="toDate" placeholder="dd/mm/yyyy"
+                                            class="date-input-field-control" readonly="">
+                                        <span class="input-group-btn">
+                                            <button class="btn default date-image-control" type="button"><i
+                                                    class="fa fa-calendar"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+
+
+
+
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Status:</label>
+                                    <div class="select2-container dropdown-input-field-control" id="s2id_status"><a
+                                            href="javascript:void(0)" class="select2-choice" tabindex="-1"> <span
+                                                class="select2-chosen" id="select2-chosen-2">-Select Voucher
+                                                Status-</span><abbr class="select2-search-choice-close"></abbr> <span
+                                                class="select2-arrow" role="presentation"><b
+                                                    role="presentation"></b></span></a><label for="s2id_autogen2"
+                                            class="select2-offscreen"></label><input
+                                            class="select2-focusser select2-offscreen" type="text" aria-haspopup="true"
+                                            role="button" aria-labelledby="select2-chosen-2" id="s2id_autogen2">
+                                        <div class="select2-drop select2-display-none select2-with-searchbox">
+                                            <div class="select2-search"> <label for="s2id_autogen2_search"
+                                                    class="select2-offscreen"></label> <input type="text"
+                                                    autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                    spellcheck="false" class="select2-input" role="combobox"
+                                                    aria-expanded="true" aria-autocomplete="list"
+                                                    aria-owns="select2-results-2" id="s2id_autogen2_search"
+                                                    placeholder=""> </div>
+                                            <ul class="select2-results" role="listbox" id="select2-results-2"> </ul>
+                                        </div>
+                                    </div><select name="status" class="dropdown-input-field-control select2-offscreen"
+                                        onchange="showBankDiv(this.value)" id="status" tabindex="-1" title="">
+                                        <option value="">-Select Voucher Status-</option>
+                                        <option value="Draft">Draft</option>
+                                        <option value="Submitted">Submitted</option>
+                                        <option value="Reviewed">Reviewed</option>
+                                        <option value="Recommended">Recommended</option>
+                                        <option value="Approved">Approved</option>
+
+
+                                        <option value="Rejected">Rejected</option>
+                                        <option value="SendBack">SendBack</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Voucher Number:</label>
+                                    <input type="text" class="input-field-control" placeholder="E.g. DV0000217 etc."
+                                        name="voucherNumber" id="voucherNumber">
+                                </div>
+
+
+                                <div class="form-group hidden">
+                                    <div class="form-group">
+                                        <label class=" col-md-5">Organization Branch: <span
+                                                class="mandatoryfield">*</span></label>
+
+                                        <div class="select2-container dropdown-input-field-control"
+                                            id="s2id_organizationBranch"><a href="javascript:void(0)"
+                                                class="select2-choice" tabindex="-1"> <span class="select2-chosen"
+                                                    id="select2-chosen-10">[HO -
+                                                    BDHO] Head Office</span><abbr
+                                                    class="select2-search-choice-close"></abbr> <span
+                                                    class="select2-arrow" role="presentation"><b
+                                                        role="presentation"></b></span></a><label for="s2id_autogen10"
+                                                class="select2-offscreen"></label><input
+                                                class="select2-focusser select2-offscreen" type="text"
+                                                aria-haspopup="true" role="button" aria-labelledby="select2-chosen-10"
+                                                id="s2id_autogen10">
+                                            <div class="select2-drop select2-display-none select2-with-searchbox">
+                                                <div class="select2-search"> <label for="s2id_autogen10_search"
+                                                        class="select2-offscreen"></label> <input type="text"
+                                                        autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                        spellcheck="false" class="select2-input" role="combobox"
+                                                        aria-expanded="true" aria-autocomplete="list"
+                                                        aria-owns="select2-results-10" id="s2id_autogen10_search"
+                                                        placeholder=""> </div>
+                                                <ul class="select2-results" role="listbox" id="select2-results-10">
+                                                </ul>
+                                            </div>
+                                        </div><select id="organizationBranch" name="organizationBranch"
+                                            class="dropdown-input-field-control select2-offscreen" title=""
+                                            tabindex="-1">
+                                            <option value="">-Select Organization Branch-</option>
+                                            <option value="2">[HO - BDHO] Head Office</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group hide">
+
+                                    <div class="radio-list">
+
+                                        <label class=" col-md-5">Debit Voucher Type:</label>
+                                        <label class="radio-inline"><input type="radio" name="postType" id="auto"
+                                                value="0" onclick="onClickRadioButton()">
+                                            <b>Auto</b>
+                                        </label>
+                                        <label class="radio-inline"><input type="radio" name="postType" id="manual"
+                                                value="1" onclick="onClickRadioButton()" checked=""> <b>Manual</b>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="autoVoucherDiv" class="hide">
+                                    <div class="form-group">
+                                        <label class="col-md-5">Module: </label>
+                                        <input type="hidden" name="moduleId" id="moduleId">
+                                        <div class="select2-container dropdown-input-field-control" id="s2id_module"><a
+                                                href="javascript:void(0)" class="select2-choice" tabindex="-1"> <span
+                                                    class="select2-chosen" id="select2-chosen-6">-Select
+                                                    Module-</span><abbr class="select2-search-choice-close"></abbr>
+                                                <span class="select2-arrow" role="presentation"><b
+                                                        role="presentation"></b></span></a><label for="s2id_autogen6"
+                                                class="select2-offscreen"></label><input
+                                                class="select2-focusser select2-offscreen" type="text"
+                                                aria-haspopup="true" role="button" aria-labelledby="select2-chosen-6"
+                                                id="s2id_autogen6">
+                                            <div class="select2-drop select2-display-none select2-with-searchbox">
+                                                <div class="select2-search"> <label for="s2id_autogen6_search"
+                                                        class="select2-offscreen"></label> <input type="text"
+                                                        autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                        spellcheck="false" class="select2-input" role="combobox"
+                                                        aria-expanded="true" aria-autocomplete="list"
+                                                        aria-owns="select2-results-6" id="s2id_autogen6_search"
+                                                        placeholder=""> </div>
+                                                <ul class="select2-results" role="listbox" id="select2-results-6"> </ul>
+                                            </div>
+                                        </div><select id="module" name="module" onchange="getDocumentName(this.value)"
+                                            class="dropdown-input-field-control select2-offscreen" title=""
+                                            tabindex="-1">
+                                            <option value="">-Select Module-</option>
+                                            <option value="1">application-common</option>
+                                            <option value="2">complaint-management</option>
+                                            <option value="7">Administration</option>
+                                            <option value="3">Human Resources</option>
+                                            <option value="6">procurement</option>
+                                            <option value="8">Budget</option>
+                                            <option value="10">Admin</option>
+                                            <option value="11">Inventory</option>
+                                            <option value="5">Accounts</option>
+                                            <option value="9">Fixed Asset</option>
+                                            <option value="4">Microfinance</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5">Feature: </label>
+                                        <input type="hidden" name="moduleId" id="documentName">
+                                        <div class="select2-container dropdown-input-field-control"
+                                            id="s2id_documentId"><a href="javascript:void(0)" class="select2-choice"
+                                                tabindex="-1"> <span class="select2-chosen"
+                                                    id="select2-chosen-3">-Select
+                                                    Document-</span><abbr class="select2-search-choice-close"></abbr>
+                                                <span class="select2-arrow" role="presentation"><b
+                                                        role="presentation"></b></span></a><label for="s2id_autogen3"
+                                                class="select2-offscreen"></label><input
+                                                class="select2-focusser select2-offscreen" type="text"
+                                                aria-haspopup="true" role="button" aria-labelledby="select2-chosen-3"
+                                                id="s2id_autogen3">
+                                            <div class="select2-drop select2-display-none select2-with-searchbox">
+                                                <div class="select2-search"> <label for="s2id_autogen3_search"
+                                                        class="select2-offscreen"></label> <input type="text"
+                                                        autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                        spellcheck="false" class="select2-input" role="combobox"
+                                                        aria-expanded="true" aria-autocomplete="list"
+                                                        aria-owns="select2-results-3" id="s2id_autogen3_search"
+                                                        placeholder=""> </div>
+                                                <ul class="select2-results" role="listbox" id="select2-results-3"> </ul>
+                                            </div>
+                                        </div><select id="documentId" name="documentId"
+                                            class="dropdown-input-field-control select2-offscreen"
+                                            onchange="getTransactionNo()" tabindex="-1" title=""></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5">Transaction No.: </label>
+                                        <div class="select2-container dropdown-input-field-control"
+                                            id="s2id_transactionNo"><a href="javascript:void(0)" class="select2-choice"
+                                                tabindex="-1"> <span class="select2-chosen"
+                                                    id="select2-chosen-4">-Transaction Number-</span><abbr
+                                                    class="select2-search-choice-close"></abbr> <span
+                                                    class="select2-arrow" role="presentation"><b
+                                                        role="presentation"></b></span></a><label for="s2id_autogen4"
+                                                class="select2-offscreen"></label><input
+                                                class="select2-focusser select2-offscreen" type="text"
+                                                aria-haspopup="true" role="button" aria-labelledby="select2-chosen-4"
+                                                id="s2id_autogen4">
+                                            <div class="select2-drop select2-display-none select2-with-searchbox">
+                                                <div class="select2-search"> <label for="s2id_autogen4_search"
+                                                        class="select2-offscreen"></label> <input type="text"
+                                                        autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                        spellcheck="false" class="select2-input" role="combobox"
+                                                        aria-expanded="true" aria-autocomplete="list"
+                                                        aria-owns="select2-results-4" id="s2id_autogen4_search"
+                                                        placeholder=""> </div>
+                                                <ul class="select2-results" role="listbox" id="select2-results-4"> </ul>
+                                            </div>
+                                        </div><select id="transactionNo" name="transactionNo"
+                                            class="dropdown-input-field-control select2-offscreen" tabindex="-1"
+                                            title=""></select>
+                                    </div>
+
+                                </div>
+
+                                <input id="voucherType" type="hidden" value="false">
+
+                                <input id="status" type="hidden">
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="panel-footer">
+                        <button type="button" class="btn green-meadow btn-sm" onclick="handleTable()">
+                            <i class="fa fa-search "></i> Search</button>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="portlet box panel panel-default">
+                <div class="portlet-title ">
+
+                    <div class="caption "><i class="fa fa-list"></i>Debit Voucher List</div>
+
+                    <div class="actions">
+                        <a class="btn default blue-stripe btn-sm"
+                            onclick="loadUrl(&#39;accJournalMaster/showIssueDebitVoucher?date=&#39;+ $(&#39;#sessionBusinessDate&#39;).val())"
+                            id="createNew">
+                            <i class="fa fa-plus"></i> Create</a>
+                        <a class="btn default red-stripe btn-sm" onclick="edit()" id="edit">
+                            <i class="fa fa-edit"></i> Edit</a>
+                    </div>
+                </div>
+
+                <div class="portlet-body">
+                    <div id="debitVoucherList_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-8 col-sm-12">
+                                <div class="dataTables_paginate paging_bootstrap_extended"
+                                    id="debitVoucherList_paginate">
+                                    <div class="pagination-panel"> Page <a
+                                            href="https://erpstaging.brac.net/node/accounting#"
+                                            class="btn btn-sm default prev disabled" title="Prev"><i
+                                                class="fa fa-angle-left"></i></a><input type="text"
+                                            class="pagination-panel-input form-control input-mini input-inline input-sm"
+                                            maxlenght="5" style="text-align:center; margin: 0 5px;"><a
+                                            href="https://erpstaging.brac.net/node/accounting#"
+                                            class="btn btn-sm default next disabled" title="Next"><i
+                                                class="fa fa-angle-right"></i></a> of <span
+                                            class="pagination-panel-total">1</span></div>
+                                </div>
+                                <div class="dataTables_length" id="debitVoucherList_length"><label><span
+                                            class="seperator">&nbsp;|&nbsp;</span>View <select
+                                            name="debitVoucherList_length" aria-controls="debitVoucherList"
+                                            class="form-control input-xsmall input-inline">
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select> records</label></div>
+                                <div class="dataTables_info" id="debitVoucherList_info" role="status"
+                                    aria-live="polite"><span class="seperator">&nbsp;|&nbsp;</span>Found
+                                    total 1 records</div>
+                            </div>
+                            <div class="col-md-4 col-sm-12">
+                                <div class="table-group-actions pull-right"></div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover dataTable no-footer"
+                                id="debitVoucherList" aria-describedby="debitVoucherList_info" role="grid">
+                                <thead>
+                                    <tr class="datatable-heading" role="row">
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Voucher Date
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Voucher No.
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Payment Type
+                                        </th>
+                                        <th class="sorting_disabled dt-right" rowspan="1" colspan="1">Amount
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Posted</th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Submitted</th>
+                                        <th class="sorting_disabled hidden-col" rowspan="1" colspan="1">
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Status</th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Preview</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr role="row" class="odd">
+                                        <td>17/12/2020</td>
+                                        <td>DV00000002/20</td>
+                                        <td>CASH</td>
+                                        <td class=" dt-right">3,000</td>
+                                        <td>No</td>
+                                        <td>Yes</td>
+                                        <td class=" hidden-col">139114609</td>
+                                        <td><a href="https://erpstaging.brac.net/node/accounting#"
+                                                onclick="getComment(&#39;Approved&#39;,&#39;DV00000002/20&#39;)">Approved</a>
+                                        </td>
+                                        <td><a href="https://erpstaging.brac.net/node/accounting#accJournalMaster/list"
+                                                onclick="setDataVoucherNo(&#39;DV00000002/20&#39;)">Preview</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8 col-sm-12">
+                                <div class="dataTables_paginate paging_bootstrap_extended">
+                                    <div class="pagination-panel"> Page <a
+                                            href="https://erpstaging.brac.net/node/accounting#"
+                                            class="btn btn-sm default prev disabled" title="Prev"><i
+                                                class="fa fa-angle-left"></i></a><input type="text"
+                                            class="pagination-panel-input form-control input-mini input-inline input-sm"
+                                            maxlenght="5" style="text-align:center; margin: 0 5px;"><a
+                                            href="https://erpstaging.brac.net/node/accounting#"
+                                            class="btn btn-sm default next disabled" title="Next"><i
+                                                class="fa fa-angle-right"></i></a> of <span
+                                            class="pagination-panel-total">1</span></div>
+                                </div>
+                                <div class="dataTables_length"><label><span class="seperator">&nbsp;|&nbsp;</span>View
+                                        <select name="debitVoucherList_length" aria-controls="debitVoucherList"
+                                            class="form-control input-xsmall input-inline">
+                                            <option value="10">10</option>
+                                            <option value="20">20</option>
+                                            <option value="30">30</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select> records</label></div>
+                                <div class="dataTables_info"><span class="seperator">&nbsp;|&nbsp;</span>Found total 1
+                                    records</div>
+                            </div>
+                            <div class="col-md-4 col-sm-12"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="portlet box panel panel-default" style="display: none" id="referenceVoucherDiv">
+                <div class="portlet-title">
+                    <div class="caption"><i class="fa fa-list"></i> List of Reference Voucher</div>
+                </div>
+
+                <div class="portlet-body">
+                    <div id="connectingVoucherList_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12"></div>
+                            <div class="col-md-6 col-sm-12"></div>
+                        </div>
+                        <div class="table-scrollable">
+                            <table class="table table-striped table-bordered table-hover dataTable no-footer"
+                                id="connectingVoucherList" role="grid" aria-describedby="connectingVoucherList_info"
+                                style="width: 100%;">
+                                <thead>
+                                    <tr class="datatable-heading" role="row">
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Voucher Date
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Voucher No.
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Posted</th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Submitted</th>
+                                        <th class="sorting_disabled hidden-col" rowspan="1" colspan="1">
+                                        </th>
+                                        <th class="sorting_disabled hidden-col" rowspan="1" colspan="1">
+                                        </th>
+                                        <th class="sorting_disabled hidden-col" rowspan="1" colspan="1">
+                                        </th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Reference
+                                            Voucher</th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Status</th>
+                                        <th class="sorting_disabled" rowspan="1" colspan="1">Preview</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="">
+                                        <td valign="top" colspan="10" class="dataTables_empty">1/1/1970</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-5 col-sm-12">
+                                <div class="dataTables_info" id="connectingVoucherList_info" role="status"
+                                    aria-live="polite">Showing 0 to 0 of 0 entries</div>
+                            </div>
+                            <div class="col-md-7 col-sm-12"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="printJournal" class="hidden">
+                <div class="panel panel-primary">
+                    <div class="panel-heading custom-panel-header">
+                        <div class="panel-title">Debit Voucher</div>
+                    </div>
+
+                    <div class="panel-body">
+                        <form id="journalVoucherForm" name="userForm" class="form-horizontal">
+                            <div id="journal">
+                                <div class="col-md-6 firstElement">
+                                    <input type="hidden" class="form-control" name="menuUrl" id="menuUrl"
+                                        value="accJournalMaster/debitList">
+                                    <input type="hidden" class="form-control" name="rowId" id="rowId">
+                                    <input type="hidden" class="form-control" name="isSubmit" id="isSubmit">
+
+
+
+                                    <div class="form-group">
+                                        <div class="col-md-1"></div>
+                                        <label class=" col-md-4" id="organizationName">Organization <span
+                                                class="mandatoryfield">*</span>:</label>
+                                        <label for="organizationName" style="width:265px;"></label>
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-1"></div>
+                                        <label class=" col-md-4" id="description">Description:</label>
+                                        <label for="description" style="width:265px;"></label>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <div class="form-group  firstElement">
+                                        <div class="col-md-1"></div>
+                                        <label class=" col-md-4" id="dateOfCreation">Date <span
+                                                class="mandatoryfield">*</span>:
+                                        </label>
+                                        <label for="dateOfCreation" style="width:265px;"></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-1"></div>
+                                        <label class=" col-md-4" id="costCenterName">Cost Center Name <span
+                                                class="mandatoryfield">*</span>:</label>
+                                        <label for="costCenterName" style="width:265px;"></label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-1"></div>
+                                        <label class=" col-md-4" id="reference">Ref:</label>
+                                        <label for="reference" style="width:265px;"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
