@@ -16,7 +16,7 @@
     <link rel="icon" type="image/png" sizes="16x16"
         href="https://erpstaging.brac.net/node/assets/favicon/favicon-16x16.png">
     <link rel="shortcut icon" href="https://erpstaging.brac.net/node/assets/favicon/favicon.ico">
-
+    <link rel="stylesheet" href="">
     <script type="text/javascript">
         var CONTEXT_PATH = "/node";
         var ROOT_APP_CONTEXT_PATH = "/";
@@ -186,6 +186,11 @@
                 <div class="container-header-new navbar-fixed-top">
                     <div class="header_container">
                         <!-- header -->
+                        <script>
+                            $(function () {
+                                $(".header_container").load("header.html");
+                            })
+                        </script>
                     </div>
                 </div>
             </div>
@@ -194,14 +199,32 @@
         <div class="row container-body-new" style="margin-top: 87px;">
             <div class="container-left-new hidden-md-down">
                 <!-- //leftpannel -->
+                <script>
+                    $(function () {
+                        $(".container-left-new").load("leftpannel.html");
+                    })
+                </script>
             </div>
 
             <!-- //middle part -->
+            <div class="container-center-new" style="min-height: calc(100vh - 105px); margin-bottom: 17px;">
+                <script>
+                    $(function () {
+                        $(".container-center-new").load("middlepart.html");
+                    })
+                </script>
+            </div>
+
         </div>
 
         <!-- //footer -->
-
-
+        <div class="container-footer-new footer navbar-fixed-bottom">
+            <script>
+                $(function () {
+                    $(".container-footer-new").load("footer.html");
+                })
+            </script>
+        </div>
     </div>
 
     <script type="text/javascript">
