@@ -518,7 +518,7 @@ abbr[title] {
 
 @media (min-width:768px) {
 
-  
+
   .col-sm-10,
   .col-sm-12,
   .col-sm-2 {
@@ -1257,7 +1257,7 @@ tbody.collapse.in {
   line-height: 20px
 }
 
-@media (min-width:768px) {
+@media (min-width:0px) {
   .navbar-nav {
     float: left;
     margin: 0
@@ -2554,7 +2554,7 @@ table.dataTable th {
 
 @media screen and (max-width:640px) {
 
-  
+
   .dataTables_wrapper .dataTables_length {
     float: none;
     text-align: center
@@ -3494,7 +3494,7 @@ fieldset[disabled] .green-meadow.btn:hover {
 
 @media (max-width:768px) {
 
-  
+
   .dataTables_wrapper .dataTables_length .form-control {
     display: inline-block
   }
@@ -5066,7 +5066,7 @@ html body .header_container h1 {
 
 @media (max-width:991px) {
   .main_nav .main_top_navigation li div {
-    font-size: 120%
+    /* font-size: 120% */
   }
 }
 
@@ -5145,7 +5145,7 @@ html body .header_container h1 {
 
 @media (max-width:991px) {
   body .container-header-new .header_bottom_bg {
-    overflow-x: auto
+    /* overflow-x: auto */
   }
 
   body .container-header-new .main_nav {
