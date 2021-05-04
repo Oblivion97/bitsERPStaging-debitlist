@@ -12,6 +12,13 @@
   font-style: normal
 }
 
+@media (min-width: 820px) {
+  /* .header_top_bg{
+    overflow-x: auto;
+  } */
+}
+
+
 .fa {
   display: inline-block;
   font-family: FontAwesome;
@@ -10344,12 +10351,9 @@ button.close {
   .visible-sm-inline-block {
     display: inline-block !important
   }
-}
 
-@media (min-width:992px) and (max-width:1199px) {
-  .visible-md {
-    display: block !important
-  }
+
+
 
   table.visible-md {
     display: table
@@ -10363,8 +10367,8 @@ button.close {
   th.visible-md {
     display: table-cell !important
   }
-}
 
+}
 @media (min-width:992px) and (max-width:1199px) {
   .visible-md-block {
     display: block !important
@@ -43821,8 +43825,8 @@ html body .header_container h1 {
   }
 
   body .container-header-new .main_nav {
-    width: 1160px;
-    height: 27px
+    /* width: 1160px;
+    height: 27px */
   }
 
   body .container-header-new .main_nav .first-level {
