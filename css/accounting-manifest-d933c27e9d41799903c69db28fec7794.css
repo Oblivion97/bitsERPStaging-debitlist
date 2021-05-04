@@ -1653,6 +1653,35 @@ button.close {
   content: " "
 }
 
+@media (max-width: 900px) {
+  .header_top_bg {
+    display: grid;
+  }
+}
+
+@media (max-width: 830px) {
+  .pageContent {
+    margin-top: 25px;
+  }
+}
+@media (max-width: 730px) {
+  .pageContent {
+    margin-top: 35px;
+  }
+}
+
+@media (max-width: 505px) {
+  .pageContent {
+    margin-top: 55px;
+  }
+}
+
+@media (max-width: 472px) {
+  .pageContent {
+    margin-top: 80px;
+  }
+}
+
 
 .container-fluid:after,
 .container:after,
