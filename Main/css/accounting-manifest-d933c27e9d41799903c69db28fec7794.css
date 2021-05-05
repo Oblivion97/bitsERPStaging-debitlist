@@ -1696,6 +1696,12 @@ button.close {
   }
 }
 
+@media (max-width: 428px) {
+  .header_top_bg {
+    height: 80px;
+  }
+}
+
 
 .container-fluid:after,
 .container:after,
