@@ -1,454 +1,595 @@
-
 <div id="layout-body-ajax" class="sbi-layout-body-container">
     <div id="pageContent" class="pageContent">
-        
 
 
 
 
-<title>Debit Voucher</title>
 
-<div class="portlet box panel panel-default">
-<div class="panel-heading custom-panel-header">
-<div class="panel-title">
-<div class="caption"><i class="fa fa-file-text-o"></i>
-    <span id="debitTitle">Create Debit Voucher</span>
-    <a class="btn-sm pull-right" href="#accJournalMaster/debitList" onclick="loadUrl('accJournalMaster/debitList')" id="createNew">
-        <i class="fa fa-arrow-left"></i> Back</a>
-</div>
-</div>
-</div>
+        <title>Debit Voucher</title>
 
-<div class="panel-body">
-<form id="issueDebitVoucherForm" name="issueDebitVoucherForm" class="form-horizontal" enctype="multipart/form-data" method="post">
-<div class="row">
-    <div id="voucher">
-        <div class="col-md-6 ">
-            <input type="hidden" class="form-control" name="menuUrl" id="menuUrl" value="accJournalMaster/showIssueDebitVoucher">
-
-            <div class="form-group">
-                <label class=" col-md-5">Voucher No:</label>
-                <input type="text" name="voucher_no" id="voucher_no" class="col-md-7 input-field-control" readonly="readonly" placeholder="Auto Generated">
-            </div>
-
-            <div class="form-group">
-                <label class="col-md-5">Category: <span class="mandatoryfield">*</span></label>
-                <div class="select2-container col-md-7 dropdown-input-field-control" id="s2id_programType"><a href="javascript:void(0)" class="select2-choice" tabindex="-1">   <span class="select2-chosen" id="select2-chosen-11">Microfinance (C002)</span><abbr class="select2-search-choice-close"></abbr>   <span class="select2-arrow" role="presentation"><b role="presentation"></b></span></a><label for="s2id_autogen11" class="select2-offscreen"></label><input class="select2-focusser select2-offscreen" type="text" aria-haspopup="true" role="button" aria-labelledby="select2-chosen-11" id="s2id_autogen11"><div class="select2-drop select2-display-none select2-with-searchbox">   <div class="select2-search">       <label for="s2id_autogen11_search" class="select2-offscreen"></label>       <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" role="combobox" aria-expanded="true" aria-autocomplete="list" aria-owns="select2-results-11" id="s2id_autogen11_search" placeholder="">   </div>   <ul class="select2-results" role="listbox" id="select2-results-11">   </ul></div></div><select name="programType" class="col-md-7 dropdown-input-field-control select2-offscreen" id="programType" onchange="programTypeChange()" tabindex="-1" title=""><option value="">-Select Category-</option><option value="C001">Non-Microfinance (C001)</option><option value="C002">Microfinance (C002)</option><option value="ENT">Enterprise (ENT)</option></select>
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">Description:<span class="mandatoryfield">*</span></label>
-                <input type="text" class="col-md-7 input-field-control" name="description" id="description" placeholder="Description" tabindex="1" maxlength="500">
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">PayTo(Type): <span class="mandatoryfield">*</span>
-                </label>
-                <select id="paytoType" name="paytoType" class="dropdown-input-field-control">
-                    <option value="other">Other</option>
-                </select>
-            </div>
-
-            <div class="form-group block">
-                <label class="col-md-5">Attach file: <a title="Maximum file size is 5MB and file formats can be 'pdf,doc,docx,xls,csv'">
-                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                </a>
-                </label>
-                <input type="file" name="attachment" id="attachment" onchange="loadFileDocument(event)">
-                <label id="fileName"></label>
-
-            </div>
-
-            <div class="form-group hidden-col">
-                <label class=" col-md-5">Debit Note:
-                </label>
-                <input type="checkbox" name="isDebitNote" id="isDebitNote" checked="checked" style="width:20px;">
-            </div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class=" col-md-5">Date: <span class="mandatoryfield">*</span></label>
-                <input type="text" id="dateOfCreation" name="dateOfCreation" tabindex="2" placeholder="dd/mm/yyyy" class="input-field-control validate[required] datepicker" readonly="readonly">
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">Ref:</label>
-                <input type="text" name="ref" id="ref" maxlength="250" placeholder="Ref" tabindex="4" value="" class="col-md-7 input-field-control">
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">PayTo(Name): <span class="mandatoryfield">*</span>
-                </label>
-
-                <input type="text" name="paytoNameTxt" id="paytoNameTxt" onkeyup="addParticular(this.value)" tabindex="5" maxlength="250" placeholder="Name" class="col-md-7 input-field-control">
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">Payment Type: <span class="mandatoryfield">*</span></label>
-                <select name="paymentType" class="dropdown-input-field-control" id="paymentType">
-<option value="">-Select Payment Type-</option>
-<option value="CASH">Cash</option>
-<option value="BANK">Bank</option>
-<option value="MOBILE_BANKING" disabled="disabled">Mobile Banking</option>
-</select>
-            </div>
-
-            <div class="form-group" id="cashSection">
-                <label class=" col-md-5">Cash Amount: <span class="mandatoryfield">*</span></label>
-                <input type="text" name="cashAmount" id="cashAmount" maxlength="15" placeholder="Eg 10000 etc" tabindex="7" class="col-md-7 input-field-control pastedString" onkeyup="changeCashAmountToText(this.value)" onkeypress="return validateFloatKeyPress(this, event);">
-            </div>
-
-            <div class="form-group" id="cashAmountWordSection">
-                <label class=" col-md-5">Cash Amount(In words): <span class="mandatoryfield">*</span>
-                </label>
-                <input type="text" class="col-md-7 input-field-control" name="cashAmountWord" id="cashAmountWord" placeholder="Amount in Words" readonly="readonly">
-            </div>
-
-        </div>
-    </div>
-</div>
-<input type="hidden" name="rowId" id="rowId">
-
-<input type="hidden" name="totalChequeAmount" maxlength="20" id="totalChequeAmount">
-
-<div id="bank_details">
-    <div class="row">
-        <legend class="panel-body" style="font-size: 15px !important;"><b>Payment Details</b>
-        </legend>
-
-        <div class="col-md-6 ">
-            <div class="form-group">
-                <label class="col-md-5">Payment Sub Type: <span class="mandatoryfield">*</span>
-                </label>
-                <select id="paymentSubType" name="paymentSubType" class="dropdown-input-field-control">
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">Bank Account: <span class="mandatoryfield">*</span></label>
-                <select id="bankAccount" name="bankAccount" class="dropdown-input-field-control">
-                </select>
-            </div>
-
-        </div>
-
-        <div class="col-md-6">
-            <div class="form-group">
-                <label class=" col-md-5">Amount: <span class="mandatoryfield">*</span>
-                </label>
-                <input type="text" class="pastedString col-md-7 input-field-control" name="checkAmount" maxlength="15" tabindex="7" onkeypress="return validateFloatKeyPress(this, event);" placeholder="Eg. 1000000 etc." id="checkAmount">
-            </div>
-
-            <div class="form-group" id="transactionNoDiv">
-                <label class=" col-md-5" id="transNo">Transaction No: <span class="mandatoryfield">*</span>
-                </label>
-                <input type="text" class="col-md-7 input-field-control" maxlength="20" name="checkNo" placeholder="E.g. 789545 etc." tabindex="8" id="checkNo">
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5" id="transDate">Transaction Date: <span class="mandatoryfield">*</span></label>
-
-                <div class="input-group input-medium date cheque-date-picker col-md-7" data-date-format="dd/mm/yyyy">
-                    <input type="text" id="checkDate" name="checkDate" placeholder="dd/mm/yyyy" class="date-input-field-control" tabindex="9" readonly="">
-                    <span class="input-group-btn">
-                        <button class="btn default date-image-control" type="button"><i class="fa fa-calendar"></i></button>
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class=" col-md-5">Particulars: <span class="mandatoryfield"></span>
-                </label>
-                <input type="text" class="col-md-7 input-field-control" name="remarks" id="remarks" placeholder="Particulars" tabindex="10" maxlength="500">
-            </div>
-
-            <div class="form-group" id="bankButtons">
-                <div class="pull-right" style="margin-right: 50px">
-                    <button id="addToGridPaymentDetails" name="create" type="button" class="btn btn-sm purple"><i class="fa fa-plus-square"></i>  Add
-                    </button>
-
-                    <button id="updateGridPaymentDetails" name="create" type="button" class="btn btn-sm purple"><i class="fa fa-plus-square"></i>  Update
-                    </button>
-                    <button id="deleteGridPaymentDetails" name="delete" type="button" class="btn btn-sm red-soft"><i class="fa fa-trash-o"></i>  Delete
-                    </button>
-                    <button id="resetDetails" name="create" type="button" class="btn btn-sm green"><i class="fa fa-refresh"></i>  Reset
-                    </button>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="portlet box panel panel-default" id="bankDetails">
-        <div class="portlet-title">
-            <div class="caption"><i class="fa fa-list"></i> Bank Details
-            </div>
-        </div>
-
-        <div class="panel-body">
-            <table id="paymentDetailTable" class="table table-bordered table-striped table-condensed">
-            </table>
-        </div>
-
-    </div>
-
-</div>
-
-
-
-
-<div id="mobilePaymentDetailsDiv" style="display: none;">
-    <div class="row">
-        <div class="panel-body">
-            <legend class="panel-body pull-left" style="font-size: 15px !important;"><b>Payment Details</b>
-            </legend>
-            <input type="hidden" name="mobileDetailsId" id="mobileDetailsId">
-
-            <div class="col-md-12">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobilePaymentSubType">Payment Sub Type: <span class="mandatoryfield">*</span>
-                        </label>
-                        <select id="mobilePaymentSubType" name="mobilePaymentSubType" class="col-md-7 dropdown-input-field-control">
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobileNumber">Mobile No: <span class="mandatoryfield">*</span>
-                        </label>
-
-                        <input type="text" id="mobileNumber" name="mobileNumber" placeholder="Mobile No" tabindex="11" onkeypress=" return checkMobileNumberPattern(event)" maxlength="20" class="col-md-7 input-field-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobileRemarks">Particulars:
-                        </label>
-
-                        <input type="text" id="mobileRemarks" name="mobileRemarks" placeholder="Particulars" maxlength="250" tabindex="12" class="col-md-7 input-field-control">
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobileAmount">Amount: <span class="mandatoryfield">*</span>
-                        </label>
-
-                        <input type="text" id="mobileAmount" name="mobileAmount" placeholder="Amount" min="0" tabindex="13" onkeypress=" return validateFloatKeyPress(this, event)" maxlength="15" class="col-md-7 input-field-control pastedString">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobileTransactionNo" id="mobileTransNo">Transaction No: <span class="mandatoryfield">*</span>
-                        </label>
-
-                        <input type="text" id="mobileTransactionNo" name="mobileTransactionNo" placeholder="e.g. 123456" maxlength="50" tabindex="14" class="col-md-7 input-field-control pastedString">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-5" for="mobileTransactionDate" id="mobileTransDate" \="">Transaction Date: <span class="mandatoryfield">*</span>
-                        </label>
-
-                        <div class="input-group input-medium date date-picker col-md-7" data-date-format="dd/mm/yyyy">
-                            <input type="text" id="mobileTransactionDate" name="mobileTransactionDate" placeholder="dd/mm/yyyy" tabindex="15" class="date-input-field-control" readonly="">
-                            <span class="input-group-btn">
-                                <button class="btn default date-image-control" type="button"><i class="fa fa-calendar"></i></button>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group" id="mobileButtons">
-                        <div class="pull-right" style="margin-right: 50px">
-                            <button id="addToMobileDetailsGrid" name="addToMobileDetailsGrid" type="button" class="btn btn-sm purple"><i class="fa fa-plus-square"></i>  Add
-                            </button>
-                            <button id="mobileUpdate" type="button" class="btn btn-sm purple"><i class="fa fa-plus-square"></i> Update
-                            </button>
-                            <button id="mobileDelete" type="button" class="btn btn-sm red-soft"><i class="fa fa-trash-o"></i> Delete
-                            </button>
-                            <button type="button" id="resetMobileDetail" class="btn btn-sm green"><i class="fa fa-refresh"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="panel-body" id="mobilePaymentDetailsGridDiv">
         <div class="portlet box panel panel-default">
-            <div class="portlet-title">
-                <div class="caption">
-                    <i class="fa fa-list"></i> List Payment Details
+            <div class="panel-heading custom-panel-header">
+                <div class="panel-title">
+                    <div class="caption"><i class="fa fa-file-text-o"></i>
+                        <span id="debitTitle">Create Debit Voucher</span>
+                        <a class="btn-sm pull-right" href="#accJournalMaster/debitList"
+                            onclick="loadUrl('accJournalMaster/debitList')" id="createNew">
+                            <i class="fa fa-arrow-left"></i> Back</a>
+                    </div>
                 </div>
             </div>
 
-            <div class="portlet-body" id="portlet-body-mobile_payment-details">
-                <table class="table table-striped table-bordered table-hover" id="mobilePaymentDetailsGrid">
-                </table>
+            <div class="panel-body">
+                <form id="issueDebitVoucherForm" name="issueDebitVoucherForm" class="form-horizontal"
+                    enctype="multipart/form-data" method="post">
+                    <div class="row">
+                        <div id="voucher">
+                            <div class="col-md-6 ">
+                                <input type="hidden" class="form-control" name="menuUrl" id="menuUrl"
+                                    value="accJournalMaster/showIssueDebitVoucher">
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Voucher No:</label>
+                                    <input type="text" name="voucher_no" id="voucher_no"
+                                        class="col-md-7 input-field-control" readonly="readonly"
+                                        placeholder="Auto Generated">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="col-md-5">Category: <span class="mandatoryfield">*</span></label>
+                                    <div class="select2-container col-md-7 dropdown-input-field-control"
+                                        id="s2id_programType"><a href="javascript:void(0)" class="select2-choice"
+                                            tabindex="-1"> <span class="select2-chosen"
+                                                id="select2-chosen-11">Microfinance (C002)</span><abbr
+                                                class="select2-search-choice-close"></abbr> <span class="select2-arrow"
+                                                role="presentation"><b role="presentation"></b></span></a><label
+                                            for="s2id_autogen11" class="select2-offscreen"></label><input
+                                            class="select2-focusser select2-offscreen" type="text" aria-haspopup="true"
+                                            role="button" aria-labelledby="select2-chosen-11" id="s2id_autogen11">
+                                        <div class="select2-drop select2-display-none select2-with-searchbox">
+                                            <div class="select2-search"> <label for="s2id_autogen11_search"
+                                                    class="select2-offscreen"></label> <input type="text"
+                                                    autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                    spellcheck="false" class="select2-input" role="combobox"
+                                                    aria-expanded="true" aria-autocomplete="list"
+                                                    aria-owns="select2-results-11" id="s2id_autogen11_search"
+                                                    placeholder=""> </div>
+                                            <ul class="select2-results" role="listbox" id="select2-results-11"> </ul>
+                                        </div>
+                                    </div><select name="programType"
+                                        class="col-md-7 dropdown-input-field-control select2-offscreen" id="programType"
+                                        onchange="programTypeChange()" tabindex="-1" title="">
+                                        <option value="">-Select Category-</option>
+                                        <option value="C001">Non-Microfinance (C001)</option>
+                                        <option value="C002">Microfinance (C002)</option>
+                                        <option value="ENT">Enterprise (ENT)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Description:<span class="mandatoryfield">*</span></label>
+                                    <input type="text" class="col-md-7 input-field-control" name="description"
+                                        id="description" placeholder="Description" tabindex="1" maxlength="500">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">PayTo(Type): <span class="mandatoryfield">*</span>
+                                    </label>
+                                    <select id="paytoType" name="paytoType" class="dropdown-input-field-control">
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group block">
+                                    <label class="col-md-5">Attach file: <a
+                                            title="Maximum file size is 5MB and file formats can be 'pdf,doc,docx,xls,csv'">
+                                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        </a>
+                                    </label>
+                                    <input type="file" name="attachment" id="attachment"
+                                        onchange="loadFileDocument(event)">
+                                    <label id="fileName"></label>
+
+                                </div>
+
+                                <div class="form-group hidden-col">
+                                    <label class=" col-md-5">Debit Note:
+                                    </label>
+                                    <input type="checkbox" name="isDebitNote" id="isDebitNote" checked="checked"
+                                        style="width:20px;">
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class=" col-md-5">Date: <span class="mandatoryfield">*</span></label>
+                                    <input type="text" id="dateOfCreation" name="dateOfCreation" tabindex="2"
+                                        placeholder="dd/mm/yyyy"
+                                        class="input-field-control validate[required] datepicker" readonly="readonly">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Ref:</label>
+                                    <input type="text" name="ref" id="ref" maxlength="250" placeholder="Ref"
+                                        tabindex="4" value="" class="col-md-7 input-field-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">PayTo(Name): <span class="mandatoryfield">*</span>
+                                    </label>
+
+                                    <input type="text" name="paytoNameTxt" id="paytoNameTxt"
+                                        onkeyup="addParticular(this.value)" tabindex="5" maxlength="250"
+                                        placeholder="Name" class="col-md-7 input-field-control">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Payment Type: <span class="mandatoryfield">*</span></label>
+                                    <select name="paymentType" class="dropdown-input-field-control" id="paymentType">
+                                        <option value="">-Select Payment Type-</option>
+                                        <option value="CASH">Cash</option>
+                                        <option value="BANK">Bank</option>
+                                        <option value="MOBILE_BANKING" disabled="disabled">Mobile Banking</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group" id="cashSection">
+                                    <label class=" col-md-5">Cash Amount: <span class="mandatoryfield">*</span></label>
+                                    <input type="text" name="cashAmount" id="cashAmount" maxlength="15"
+                                        placeholder="Eg 10000 etc" tabindex="7"
+                                        class="col-md-7 input-field-control pastedString"
+                                        onkeyup="changeCashAmountToText(this.value)"
+                                        onkeypress="return validateFloatKeyPress(this, event);">
+                                </div>
+
+                                <div class="form-group" id="cashAmountWordSection">
+                                    <label class=" col-md-5">Cash Amount(In words): <span
+                                            class="mandatoryfield">*</span>
+                                    </label>
+                                    <input type="text" class="col-md-7 input-field-control" name="cashAmountWord"
+                                        id="cashAmountWord" placeholder="Amount in Words" readonly="readonly">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="rowId" id="rowId">
+
+                    <input type="hidden" name="totalChequeAmount" maxlength="20" id="totalChequeAmount">
+
+                    <div id="bank_details">
+                        <div class="row">
+                            <legend class="panel-body" style="font-size: 15px !important;"><b>Payment Details</b>
+                            </legend>
+
+                            <div class="col-md-6 ">
+                                <div class="form-group">
+                                    <label class="col-md-5">Payment Sub Type: <span class="mandatoryfield">*</span>
+                                    </label>
+                                    <select id="paymentSubType" name="paymentSubType"
+                                        class="dropdown-input-field-control">
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Bank Account: <span class="mandatoryfield">*</span></label>
+                                    <select id="bankAccount" name="bankAccount" class="dropdown-input-field-control">
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class=" col-md-5">Amount: <span class="mandatoryfield">*</span>
+                                    </label>
+                                    <input type="text" class="pastedString col-md-7 input-field-control"
+                                        name="checkAmount" maxlength="15" tabindex="7"
+                                        onkeypress="return validateFloatKeyPress(this, event);"
+                                        placeholder="Eg. 1000000 etc." id="checkAmount">
+                                </div>
+
+                                <div class="form-group" id="transactionNoDiv">
+                                    <label class=" col-md-5" id="transNo">Transaction No: <span
+                                            class="mandatoryfield">*</span>
+                                    </label>
+                                    <input type="text" class="col-md-7 input-field-control" maxlength="20"
+                                        name="checkNo" placeholder="E.g. 789545 etc." tabindex="8" id="checkNo">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5" id="transDate">Transaction Date: <span
+                                            class="mandatoryfield">*</span></label>
+
+                                    <div class="input-group input-medium date cheque-date-picker col-md-7"
+                                        data-date-format="dd/mm/yyyy">
+                                        <input type="text" id="checkDate" name="checkDate" placeholder="dd/mm/yyyy"
+                                            class="date-input-field-control" tabindex="9" readonly="">
+                                        <span class="input-group-btn">
+                                            <button class="btn default date-image-control" type="button"><i
+                                                    class="fa fa-calendar"></i></button>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class=" col-md-5">Particulars: <span class="mandatoryfield"></span>
+                                    </label>
+                                    <input type="text" class="col-md-7 input-field-control" name="remarks" id="remarks"
+                                        placeholder="Particulars" tabindex="10" maxlength="500">
+                                </div>
+
+                                <div class="form-group" id="bankButtons">
+                                    <div class="pull-right" style="margin-right: 50px">
+                                        <button id="addToGridPaymentDetails" name="create" type="button"
+                                            class="btn btn-sm purple"><i class="fa fa-plus-square"></i> Add
+                                        </button>
+
+                                        <button id="updateGridPaymentDetails" name="create" type="button"
+                                            class="btn btn-sm purple"><i class="fa fa-plus-square"></i> Update
+                                        </button>
+                                        <button id="deleteGridPaymentDetails" name="delete" type="button"
+                                            class="btn btn-sm red-soft"><i class="fa fa-trash-o"></i> Delete
+                                        </button>
+                                        <button id="resetDetails" name="create" type="button"
+                                            class="btn btn-sm green"><i class="fa fa-refresh"></i> Reset
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="portlet box panel panel-default" id="bankDetails">
+                            <div class="portlet-title">
+                                <div class="caption"><i class="fa fa-list"></i> Bank Details
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <table id="paymentDetailTable"
+                                    class="table table-bordered table-striped table-condensed">
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+
+
+                    <div id="mobilePaymentDetailsDiv" style="display: none;">
+                        <div class="row">
+                            <div class="panel-body">
+                                <legend class="panel-body pull-left" style="font-size: 15px !important;"><b>Payment
+                                        Details</b>
+                                </legend>
+                                <input type="hidden" name="mobileDetailsId" id="mobileDetailsId">
+
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobilePaymentSubType">Payment Sub Type: <span
+                                                    class="mandatoryfield">*</span>
+                                            </label>
+                                            <select id="mobilePaymentSubType" name="mobilePaymentSubType"
+                                                class="col-md-7 dropdown-input-field-control">
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobileNumber">Mobile No: <span
+                                                    class="mandatoryfield">*</span>
+                                            </label>
+
+                                            <input type="text" id="mobileNumber" name="mobileNumber"
+                                                placeholder="Mobile No" tabindex="11"
+                                                onkeypress=" return checkMobileNumberPattern(event)" maxlength="20"
+                                                class="col-md-7 input-field-control">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobileRemarks">Particulars:
+                                            </label>
+
+                                            <input type="text" id="mobileRemarks" name="mobileRemarks"
+                                                placeholder="Particulars" maxlength="250" tabindex="12"
+                                                class="col-md-7 input-field-control">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobileAmount">Amount: <span
+                                                    class="mandatoryfield">*</span>
+                                            </label>
+
+                                            <input type="text" id="mobileAmount" name="mobileAmount"
+                                                placeholder="Amount" min="0" tabindex="13"
+                                                onkeypress=" return validateFloatKeyPress(this, event)" maxlength="15"
+                                                class="col-md-7 input-field-control pastedString">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobileTransactionNo"
+                                                id="mobileTransNo">Transaction No: <span class="mandatoryfield">*</span>
+                                            </label>
+
+                                            <input type="text" id="mobileTransactionNo" name="mobileTransactionNo"
+                                                placeholder="e.g. 123456" maxlength="50" tabindex="14"
+                                                class="col-md-7 input-field-control pastedString">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5" for="mobileTransactionDate" id="mobileTransDate"
+                                                \="">Transaction Date: <span class="mandatoryfield">*</span>
+                                            </label>
+
+                                            <div class="input-group input-medium date date-picker col-md-7"
+                                                data-date-format="dd/mm/yyyy">
+                                                <input type="text" id="mobileTransactionDate"
+                                                    name="mobileTransactionDate" placeholder="dd/mm/yyyy" tabindex="15"
+                                                    class="date-input-field-control" readonly="">
+                                                <span class="input-group-btn">
+                                                    <button class="btn default date-image-control" type="button"><i
+                                                            class="fa fa-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" id="mobileButtons">
+                                            <div class="pull-right" style="margin-right: 50px">
+                                                <button id="addToMobileDetailsGrid" name="addToMobileDetailsGrid"
+                                                    type="button" class="btn btn-sm purple"><i
+                                                        class="fa fa-plus-square"></i> Add
+                                                </button>
+                                                <button id="mobileUpdate" type="button" class="btn btn-sm purple"><i
+                                                        class="fa fa-plus-square"></i> Update
+                                                </button>
+                                                <button id="mobileDelete" type="button" class="btn btn-sm red-soft"><i
+                                                        class="fa fa-trash-o"></i> Delete
+                                                </button>
+                                                <button type="button" id="resetMobileDetail" class="btn btn-sm green"><i
+                                                        class="fa fa-refresh"></i> Reset
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel-body" id="mobilePaymentDetailsGridDiv">
+                            <div class="portlet box panel panel-default">
+                                <div class="portlet-title">
+                                    <div class="caption">
+                                        <i class="fa fa-list"></i> List Payment Details
+                                    </div>
+                                </div>
+
+                                <div class="portlet-body" id="portlet-body-mobile_payment-details">
+                                    <table class="table table-striped table-bordered table-hover"
+                                        id="mobilePaymentDetailsGrid">
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="row">
+                        <div id="voucher-details">
+                            <legend class="panel-body pull-left" style="font-size: 15px !important;"><b>Debit Voucher
+                                    Details</b>
+                            </legend>
+
+                            <div class="panel-body">
+                                <div class="col-md-6">
+                                    <div class="form-group" id="projectNameWrap">
+                                        <label class=" col-md-5">Project: <span class="mandatoryfield">*</span>
+                                        </label>
+                                        <div class="select2-container dropdown-input-field-control"
+                                            id="s2id_projectName"><a href="javascript:void(0)" class="select2-choice"
+                                                tabindex="-1"> <span class="select2-chosen"
+                                                    id="select2-chosen-12">-Select Project-</span><abbr
+                                                    class="select2-search-choice-close"></abbr> <span
+                                                    class="select2-arrow" role="presentation"><b
+                                                        role="presentation"></b></span></a><label for="s2id_autogen12"
+                                                class="select2-offscreen"></label><input
+                                                class="select2-focusser select2-offscreen" type="text"
+                                                aria-haspopup="true" role="button" aria-labelledby="select2-chosen-12"
+                                                id="s2id_autogen12">
+                                            <div class="select2-drop select2-display-none select2-with-searchbox">
+                                                <div class="select2-search"> <label for="s2id_autogen12_search"
+                                                        class="select2-offscreen"></label> <input type="text"
+                                                        autocomplete="off" autocorrect="off" autocapitalize="off"
+                                                        spellcheck="false" class="select2-input" role="combobox"
+                                                        aria-expanded="true" aria-autocomplete="list"
+                                                        aria-owns="select2-results-12" id="s2id_autogen12_search"
+                                                        placeholder=""> </div>
+                                                <ul class="select2-results" role="listbox" id="select2-results-12">
+                                                </ul>
+                                            </div>
+                                        </div><select id="projectName" name="projectName" onchange="projectChange();"
+                                            class="dropdown-input-field-control select2-offscreen" tabindex="-1"
+                                            title="">
+                                            <option value="">-Select Project-</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="form-group" id="chartOfAccountsWrap">
+                                        <label class=" col-md-5">A/C Code: <span class="mandatoryfield">*</span></label>
+                                        <select id="chartOfAccounts" name="chartOfAccounts"
+                                            onclick="chartOfAccountsChange();" class="dropdown-input-field-control">
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class=" col-md-5">A/C Name:</label>
+
+                                        <input type="text" name="accountName" id="accountName" placeholder="A/C Name"
+                                            class="col-md-7 input-field-control" readonly="readonly">
+                                    </div>
+
+                                    <div class="form-group" id="subLedgerWrap" style="display: none;">
+                                        <label class=" col-md-5">A/C Sub-Code: <span
+                                                class="mandatoryfield">*</span></label>
+                                        <select id="subLedger" name="subLedger" class="dropdown-input-field-control">
+                                        </select>
+                                    </div>
+
+
+                                    <div class="form-group" id="entityDiv" style="display: none;">
+                                        <label class=" col-md-5">Entity:
+                                        </label>
+                                        <select id="entityId" name="entity_id" class="dropdown-input-field-control">
+                                        </select>
+                                    </div>
+
+
+                                    <div class="form-group " id="reconCodeWrap" style="display: none;">
+                                        <label class=" col-md-5">ReconCode: <span
+                                                class="mandatoryfield">*</span></label>
+                                        <select id="reconCode" name="reconCode"
+                                            onchange="reconCodeDropDownOnChanges(this.id)"
+                                            class="dropdown-input-field-control">
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" id="toBranchWrap" style="display: none;">
+                                        <label class=" col-md-5">To Branch <span class="mandatoryfield">*</span></label>
+                                        <input id="toBranch" name="toBranch" onclick="toBranchChange();"
+                                            class="col-md-7 dropdown-input-field-control">
+                                    </div>
+
+                                    <div class="form-group" id="toProjectWrap" style="display: none;">
+                                        <label class=" col-md-5">To Project: <span class="mandatoryfield">*</span>
+                                        </label>
+                                        <select id="toProject" name="toProject" class="dropdown-input-field-control">
+                                        </select>
+                                    </div>
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <div class="form-group" id="warp_areaCode" style="display: none;">
+                                        <label class=" col-md-5">Area Code: <span
+                                                class="mandatoryfield">*</span></label>
+                                        <input type="text" min="0" class="pastedString input-field-control"
+                                            name="areaCode" id="areaCode" maxlength="9" readonly=""
+                                            onkeypress="return validateFloatKeyPress(this, event);">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class=" col-md-5">Amount(Dr.): <span class="mandatoryfield">*</span>
+                                        </label>
+
+                                        <input type="text" class="pastedString col-md-7 input-field-control"
+                                            maxlength="15" onkeypress="return validateFloatKeyPress(this, event);"
+                                            placeholder="Eg. 1000000." tabindex="16" name="debit" id="debit"
+                                            onkeyup="changeNumberToText(this.value)">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class=" col-md-5">Amount(In words): <span class="mandatoryfield">*</span>
+                                        </label>
+
+                                        <input type="text" class="col-md-7 input-field-control" name="amount"
+                                            id="amount" placeholder="Amount in Words" readonly="readonly">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class=" col-md-5">Particulars: <span
+                                                class="mandatoryfield">*</span></label>
+
+
+
+
+                                        <textarea type="text" min="0" class="form-control" name="remarksp" id="remarksp"
+                                            rows="4" placeholder="Particulars" maxlength="250"></textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input type="hidden" class="form-control " name="total" id="total">
+                                        <input type="hidden" class="form-control " name="totalcredit" id="totalcredit">
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group" id="detailsButton">
+                                    <div class="pull-right" style="margin-right: 50px">
+                                        <button id="addToGridVoucherDetails" name="create" type="button"
+                                            class="btn btn-sm purple"><i class="fa fa-plus-square"></i> Add
+                                        </button>
+                                        <button id="updateGridVoucherDetails" name="create" type="button"
+                                            class="btn btn-sm purple" style="display: none;"><i
+                                                class="fa fa-plus-square"></i> Update
+                                        </button>
+                                        <button id="deleteGridVoucherDetails" type="button" class="btn btn-sm red-soft"
+                                            style="display: none;"><i class="fa fa-trash-o"></i> Delete
+                                        </button>
+                                        <button id="resetVoucherDetails" type="button" class="btn btn-sm green"><i
+                                                class="fa fa-refresh"></i> Reset
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </form>
+
+                <div class="portlet box panel panel-default" id="debitVoucherDiv">
+                    <div class="portlet-title">
+                        <div class="caption"><i class="fa fa-list"></i> Voucher Details</div>
+                    </div>
+                    <input type="hidden" name="fundControlId" id="fundControlId">
+                    <input type="hidden" name="fundControlName" id="fundControlName">
+
+                    <div class="panel-body">
+                        <table id="issuDebitVoucherDetailTable"
+                            class="table table-bordered table-striped table-condensed">
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <div class="col-md-12"></div>
+
+                <div id="saveOptions">
+                    <button id="save" name="post" type="button" class="btn btn btn-sm blue">
+                        <i class="fa fa-check"></i> Draft
+                    </button>
+                    <button id="saveUpdate" name="post" type="button" class="btn btn btn-sm blue"><i
+                            class="fa fa-check"></i> Update
+                    </button>
+                    <button id="submit" name="post" type="button" class="btn btn-sm yellow-gold">
+                        <i class="fa fa-hand-o-up"></i> Submit
+                    </button>
+                    <button id="delete" name="cancel" type="button" class="btn btn-sm red-soft"><i
+                            class="fa fa-trash-o"></i> Delete
+                    </button>
+
+                    <button id="resetDebitForm" name="clearFormButton" type="button" data-role="button"
+                        class="btn btn-sm green pull-right" role="button" tabindex="10" aria-disabled="false"
+                        onclick="resetForm();"><i class="fa fa-refresh"></i> Reset
+                    </button>
+                </div>
+
             </div>
         </div>
+
     </div>
-</div>
-
-
-
-<div class="row">
-    <div id="voucher-details">
-        <legend class="panel-body pull-left" style="font-size: 15px !important;"><b>Debit Voucher Details</b>
-        </legend>
-
-        <div class="panel-body">
-            <div class="col-md-6">
-                <div class="form-group" id="projectNameWrap">
-                    <label class=" col-md-5">Project: <span class="mandatoryfield">*</span>
-                    </label>
-                    <div class="select2-container dropdown-input-field-control" id="s2id_projectName"><a href="javascript:void(0)" class="select2-choice" tabindex="-1">   <span class="select2-chosen" id="select2-chosen-12">-Select Project-</span><abbr class="select2-search-choice-close"></abbr>   <span class="select2-arrow" role="presentation"><b role="presentation"></b></span></a><label for="s2id_autogen12" class="select2-offscreen"></label><input class="select2-focusser select2-offscreen" type="text" aria-haspopup="true" role="button" aria-labelledby="select2-chosen-12" id="s2id_autogen12"><div class="select2-drop select2-display-none select2-with-searchbox">   <div class="select2-search">       <label for="s2id_autogen12_search" class="select2-offscreen"></label>       <input type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" class="select2-input" role="combobox" aria-expanded="true" aria-autocomplete="list" aria-owns="select2-results-12" id="s2id_autogen12_search" placeholder="">   </div>   <ul class="select2-results" role="listbox" id="select2-results-12">   </ul></div></div><select id="projectName" name="projectName" onchange="projectChange();" class="dropdown-input-field-control select2-offscreen" tabindex="-1" title=""><option value="">-Select Project-</option></select>
-                </div>
-
-
-                <div class="form-group" id="chartOfAccountsWrap">
-                    <label class=" col-md-5">A/C Code: <span class="mandatoryfield">*</span></label>
-                    <select id="chartOfAccounts" name="chartOfAccounts" onclick="chartOfAccountsChange();" class="dropdown-input-field-control">
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class=" col-md-5">A/C Name:</label>
-
-                    <input type="text" name="accountName" id="accountName" placeholder="A/C Name" class="col-md-7 input-field-control" readonly="readonly">
-                </div>
-
-                <div class="form-group" id="subLedgerWrap" style="display: none;">
-                    <label class=" col-md-5">A/C Sub-Code: <span class="mandatoryfield">*</span></label>
-                    <select id="subLedger" name="subLedger" class="dropdown-input-field-control">
-                    </select>
-                </div>
-
-
-                <div class="form-group" id="entityDiv" style="display: none;">
-                    <label class=" col-md-5">Entity:
-                    </label>
-                    <select id="entityId" name="entity_id" class="dropdown-input-field-control">
-                    </select>
-                </div>
-
-
-                <div class="form-group " id="reconCodeWrap" style="display: none;">
-                    <label class=" col-md-5">ReconCode: <span class="mandatoryfield">*</span></label>
-                    <select id="reconCode" name="reconCode" onchange="reconCodeDropDownOnChanges(this.id)" class="dropdown-input-field-control">
-                    </select>
-                </div>
-
-                <div class="form-group" id="toBranchWrap" style="display: none;">
-                    <label class=" col-md-5">To Branch <span class="mandatoryfield">*</span></label>
-                    <input id="toBranch" name="toBranch" onclick="toBranchChange();" class="col-md-7 dropdown-input-field-control">
-                </div>
-
-                <div class="form-group" id="toProjectWrap" style="display: none;">
-                    <label class=" col-md-5">To Project: <span class="mandatoryfield">*</span>
-                    </label>
-                    <select id="toProject" name="toProject" class="dropdown-input-field-control">
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="col-md-6">
-
-                <div class="form-group" id="warp_areaCode" style="display: none;">
-                    <label class=" col-md-5">Area Code: <span class="mandatoryfield">*</span></label>
-                    <input type="text" min="0" class="pastedString input-field-control" name="areaCode" id="areaCode" maxlength="9" readonly="" onkeypress="return validateFloatKeyPress(this, event);">
-                </div>
-
-                <div class="form-group">
-                    <label class=" col-md-5">Amount(Dr.): <span class="mandatoryfield">*</span>
-                    </label>
-
-                    <input type="text" class="pastedString col-md-7 input-field-control" maxlength="15" onkeypress="return validateFloatKeyPress(this, event);" placeholder="Eg. 1000000." tabindex="16" name="debit" id="debit" onkeyup="changeNumberToText(this.value)">
-                </div>
-
-                <div class="form-group">
-                    <label class=" col-md-5">Amount(In words): <span class="mandatoryfield">*</span>
-                    </label>
-
-                    <input type="text" class="col-md-7 input-field-control" name="amount" id="amount" placeholder="Amount in Words" readonly="readonly">
-                </div>
-
-
-                <div class="form-group">
-                    <label class=" col-md-5">Particulars: <span class="mandatoryfield">*</span></label>
-
-
-
-
-                    <textarea type="text" min="0" class="form-control" name="remarksp" id="remarksp" rows="4" placeholder="Particulars" maxlength="250"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <input type="hidden" class="form-control " name="total" id="total">
-                    <input type="hidden" class="form-control " name="totalcredit" id="totalcredit">
-                </div>
-
-            </div>
-
-            <div class="form-group" id="detailsButton">
-                <div class="pull-right" style="margin-right: 50px">
-                    <button id="addToGridVoucherDetails" name="create" type="button" class="btn btn-sm purple"><i class="fa fa-plus-square"></i>  Add
-                    </button>
-                    <button id="updateGridVoucherDetails" name="create" type="button" class="btn btn-sm purple" style="display: none;"><i class="fa fa-plus-square"></i>  Update
-                    </button>
-                    <button id="deleteGridVoucherDetails" type="button" class="btn btn-sm red-soft" style="display: none;"><i class="fa fa-trash-o"></i> Delete
-                    </button>
-                    <button id="resetVoucherDetails" type="button" class="btn btn-sm green"><i class="fa fa-refresh"></i>  Reset
-                    </button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-</div>
-
-
-</form>
-
-<div class="portlet box panel panel-default" id="debitVoucherDiv">
-<div class="portlet-title">
-    <div class="caption"><i class="fa fa-list"></i> Voucher Details</div>
-</div>
-<input type="hidden" name="fundControlId" id="fundControlId">
-<input type="hidden" name="fundControlName" id="fundControlName">
-
-<div class="panel-body">
-    <table id="issuDebitVoucherDetailTable" class="table table-bordered table-striped table-condensed">
-    </table>
-</div>
-
-</div>
-</div>
-
-<div class="panel-footer">
-<div class="col-md-12"></div>
-
-<div id="saveOptions">
-<button id="save" name="post" type="button" class="btn btn btn-sm blue">
-    <i class="fa fa-check"></i> Draft
-</button>
-<button id="saveUpdate" name="post" type="button" class="btn btn btn-sm blue"><i class="fa fa-check"></i> Update
-</button>
-<button id="submit" name="post" type="button" class="btn btn-sm yellow-gold">
-    <i class="fa fa-hand-o-up"></i> Submit
-</button>
-<button id="delete" name="cancel" type="button" class="btn btn-sm red-soft"><i class="fa fa-trash-o"></i> Delete
-</button>
-
-<button id="resetDebitForm" name="clearFormButton" type="button" data-role="button" class="btn btn-sm green pull-right" role="button" tabindex="10" aria-disabled="false" onclick="resetForm();"><i class="fa fa-refresh"></i> Reset
-</button>
-</div>
-
-</div>
-</div>
-
-</div>
 </div>
 </div>
