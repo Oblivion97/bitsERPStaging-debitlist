@@ -52,7 +52,8 @@
 
 
 
-@media (max-width: 1325px) {
+@media (max-width: 1330px) {
+
   .support_container,
   .container-left-new {
     display: none;
@@ -1040,8 +1041,8 @@ tbody.collapse.in {
 
 .input-group[class*=col-] {
   float: none;
-  padding-right: 0;
-  padding-left: 0
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .input-group .form-control {
@@ -1714,6 +1715,13 @@ button.close {
   }
 }
 
+
+
+/* @media (max-width: 1094px) {
+  .select2-container {
+    padding-left: 15px;
+  }
+} */
 
 .container-fluid:after,
 .container:after,
@@ -4236,8 +4244,12 @@ table.dataTable.no-footer {
 .dropdown-input-field-control {
   width: 250px;
   height: 22px;
-  padding: 0;
+  padding-left: 0px;
   font-size: 13px
+}
+
+.voucharnoEditAlignment {
+  padding-left: 15px;
 }
 
 .date-input-field-control {
