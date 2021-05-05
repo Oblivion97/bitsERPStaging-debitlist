@@ -54,9 +54,15 @@
 
 @media (max-width: 1330px) {
 
+
+
   .support_container,
   .container-left-new {
     display: none;
+  }
+
+  .container-center-new {
+    width: 100% !important;
   }
 }
 
@@ -2206,7 +2212,7 @@ div.radio {
 .select2-container {
   margin: 0;
   position: relative;
-  display: inline-block;
+  /* display: inline-block; */
   zoom: 1;
   vertical-align: middle
 }
@@ -2990,7 +2996,7 @@ fieldset[disabled] .form-control {
 }
 
 .input-medium {
-  width: 240px !important
+  width: 280px !important
 }
 
 .input-inline {
@@ -5065,22 +5071,23 @@ body .header_container {
 }
 
 .container-body-new {
-  width: 100%;
-  float: left;
-  clear: both
+  width: auto;
+  /* float: left; */
+  clear: both;
+  display: flex;
 }
 
 .container-left-new {
-  float: left;
-  width: 18%;
+  /* float: left; */
+  width: 12%;
   padding: 1%;
   max-width: 220px;
   min-width: 215px
 }
 
 .container-center-new {
-  float: left;
-  width: 83%;
+  /* float: left; */
+  width: 88%;
   padding: 1%;
   border-left: 1px solid #8cb9d5;
   margin-bottom: 17px
