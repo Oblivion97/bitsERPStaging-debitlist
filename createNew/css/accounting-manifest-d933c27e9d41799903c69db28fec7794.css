@@ -1654,17 +1654,32 @@ button.close {
   content: " "
 }
 
+
+
+
+
 @media (max-width: 900px) {
   .header_top_bg {
     display: grid;
+    
   }
 }
+
+
+
+
+
 
 @media (max-width: 900px) {
   .pageContent {
     margin-top: 15px;
   }
 }
+
+
+
+
+
 
 @media (max-width: 823px) {
   .pageContent {
@@ -1689,6 +1704,17 @@ button.close {
     margin-top: 65px;
   }
 }
+
+@media (max-width: 467px) {
+  .pageContent {
+    margin-top: 95px;
+  }
+}
+
+
+
+
+
 
 
 .container-fluid:after,
