@@ -51,13 +51,14 @@
 
 
 
-
-@media (max-width: 1325px) {
+@media (max-width: 1330px) {
   .support_container,
   .container-left-new {
     display: none;
-  }
+  } 
 }
+
+
 
 .fa-search:before {
   content: "\f002"
@@ -5068,7 +5069,7 @@ body .header_container {
 
 .container-center-new {
   float: left;
-  width: 83%;
+  width: 100%;
   padding: 1%;
   border-left: 1px solid #8cb9d5;
   margin-bottom: 17px
