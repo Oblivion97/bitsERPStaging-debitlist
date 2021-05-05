@@ -1690,6 +1690,12 @@ button.close {
   }
 }
 
+@media (max-width: 467px) {
+  .pageContent {
+    margin-top: 95px;
+  }
+}
+
 
 .container-fluid:after,
 .container:after,
