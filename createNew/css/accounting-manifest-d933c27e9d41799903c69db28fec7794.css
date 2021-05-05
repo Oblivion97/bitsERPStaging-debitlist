@@ -1654,21 +1654,11 @@ button.close {
   content: " "
 }
 
-
-
-
-
 @media (max-width: 900px) {
   .header_top_bg {
     display: grid;
-    
   }
 }
-
-
-
-
-
 
 @media (max-width: 900px) {
   .pageContent {
@@ -1676,14 +1666,9 @@ button.close {
   }
 }
 
-
-
-
-
-
 @media (max-width: 823px) {
   .pageContent {
-    margin-top: 35px;
+    margin-top: 45px;
   }
 }
 
@@ -1711,10 +1696,23 @@ button.close {
   }
 }
 
+@media (max-width: 467px) {
+  .pageContent {
+    margin-top: 105px;
+  }
+}
 
+@media (max-width: 430px) {
+  .pageContent {
+    margin-top: 120px;
+  }
+}
 
-
-
+@media (max-width: 428px) {
+  .header_top_bg {
+    height: 80px;
+  }
+}
 
 
 .container-fluid:after,
